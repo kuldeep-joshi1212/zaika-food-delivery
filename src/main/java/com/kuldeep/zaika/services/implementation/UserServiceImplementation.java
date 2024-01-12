@@ -4,6 +4,7 @@ import com.kuldeep.zaika.enities.User;
 import com.kuldeep.zaika.enums.UserType;
 import com.kuldeep.zaika.exceptions.UserException;
 import com.kuldeep.zaika.repositories.UserRepository;
+import com.kuldeep.zaika.security.LoginTokenService;
 import com.kuldeep.zaika.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,10 +17,12 @@ import java.util.Objects;
 public class UserServiceImplementation implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final LoginTokenService loginTokenService;
     @Autowired
-    public UserServiceImplementation(UserRepository userRepository, PasswordEncoder passwordEncoder){
+    public UserServiceImplementation(UserRepository userRepository, PasswordEncoder passwordEncoder, LoginTokenService loginTokenService){
         this.userRepository=userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.loginTokenService = loginTokenService;
     }
     public User signUp(User user) throws UserException {
         if(Boolean.FALSE.equals(validateUser(user))){
@@ -64,6 +67,7 @@ public class UserServiceImplementation implements UserService {
         if(Objects.isNull(loginUser)){
             throw new UserException("user not found");
         }
+        user.setToken(loginTokenService.createToken(user.getUsername()));
         if(passwordEncoder.matches(user.getPassword(), loginUser.getPassword())){
             return user;
         }else{
