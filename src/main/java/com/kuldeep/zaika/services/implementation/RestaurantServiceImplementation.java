@@ -1,14 +1,12 @@
 package com.kuldeep.zaika.services.implementation;
 
 import com.kuldeep.zaika.enities.Restaurant;
-import com.kuldeep.zaika.enities.Token;
 import com.kuldeep.zaika.enities.User;
 import com.kuldeep.zaika.enums.RestaurantType;
 import com.kuldeep.zaika.enums.UserType;
 import com.kuldeep.zaika.exceptions.AuthenticationException;
 import com.kuldeep.zaika.exceptions.RestaurantException;
 import com.kuldeep.zaika.repositories.RestaurnatRepository;
-import com.kuldeep.zaika.repositories.TokenRepository;
 import com.kuldeep.zaika.repositories.UserRepository;
 import com.kuldeep.zaika.security.jwt.JwtTokenService;
 import com.kuldeep.zaika.services.RestaurantService;
