@@ -1,5 +1,6 @@
 package com.kuldeep.zaika.controllers;
 
+import com.kuldeep.zaika.enities.Token;
 import com.kuldeep.zaika.enities.User;
 import com.kuldeep.zaika.exceptions.UserException;
 import com.kuldeep.zaika.repositories.UserRepository;
@@ -33,19 +34,20 @@ public class UserController {
             }
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            log.error(e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    @PostMapping("login")
-    ResponseEntity<User> login(@RequestBody User user){
+    @PostMapping("/login")
+    ResponseEntity<Token> login(@RequestBody User user){//will need to return jwt token here
         try{
-            User loggedInUser=userService.login(user);
-            if(Objects.nonNull(loggedInUser)){
-                return ResponseEntity.ok(loggedInUser);
+            Token token=userService.login(user);
+            if(Objects.nonNull(token)){
+                return ResponseEntity.ok(token);
             }
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }catch(UserException e){
-            log.error("please enter"+e);
+            log.error("please enter");
             return new ResponseEntity<>(HttpStatus.IM_USED);
         }
     }

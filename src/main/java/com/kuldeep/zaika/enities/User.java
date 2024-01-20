@@ -40,13 +40,12 @@ public class User {
     @Setter
     @NotNull
     private String password;
-    @Getter
-    @Setter
-    private String token;
     @CreationTimestamp
     private LocalDateTime createdAt;
     @OneToMany(fetch = FetchType.LAZY,mappedBy ="user", cascade = CascadeType.ALL)
     private List<PaymentMethod> addresses;
+    @OneToMany(fetch = FetchType.LAZY,mappedBy ="user", cascade = CascadeType.ALL)
+    private List<Token> tokens;
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user",cascade = CascadeType.ALL)
     private List<Order> orders;
     @OneToOne
@@ -54,4 +53,8 @@ public class User {
     private Cart cart;
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user",cascade = CascadeType.ALL)
     private List<Address> address;
+    @Getter
+    @Setter
+    @OneToOne(mappedBy = "user")
+    private Restaurant restaurant;
 }

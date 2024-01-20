@@ -1,10 +1,13 @@
 package com.kuldeep.zaika.services.implementation;
 
+import com.kuldeep.zaika.ZaikaConfigProperties;
+import com.kuldeep.zaika.enities.Token;
 import com.kuldeep.zaika.enities.User;
 import com.kuldeep.zaika.enums.UserType;
 import com.kuldeep.zaika.exceptions.UserException;
+import com.kuldeep.zaika.repositories.TokenRepository;
 import com.kuldeep.zaika.repositories.UserRepository;
-import com.kuldeep.zaika.security.LoginTokenService;
+import com.kuldeep.zaika.security.jwt.JwtTokenService;
 import com.kuldeep.zaika.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,12 +20,20 @@ import java.util.Objects;
 public class UserServiceImplementation implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final LoginTokenService loginTokenService;
+    private final JwtTokenService jwtTokenService;
+    private final TokenRepository tokenRepository;
+    private final ZaikaConfigProperties zaikaConfigProperties;
     @Autowired
-    public UserServiceImplementation(UserRepository userRepository, PasswordEncoder passwordEncoder, LoginTokenService loginTokenService){
+    public UserServiceImplementation(UserRepository userRepository,
+                                     PasswordEncoder passwordEncoder,
+                                     JwtTokenService jwtTokenService,
+                                     TokenRepository tokenRepository,
+                                     ZaikaConfigProperties zaikaConfigProperties){
         this.userRepository=userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.loginTokenService = loginTokenService;
+        this.jwtTokenService = jwtTokenService;
+        this.tokenRepository = tokenRepository;
+        this.zaikaConfigProperties = zaikaConfigProperties;
     }
     public User signUp(User user) throws UserException {
         if(Boolean.FALSE.equals(validateUser(user))){
@@ -30,11 +41,11 @@ public class UserServiceImplementation implements UserService {
         }
         User usernameDuplicate=userRepository.findByUsername(user.getUsername());
         if(Objects.nonNull(usernameDuplicate)){
-            return usernameDuplicate;
+            throw new UserException("username already exist");
         }
         User emailDuplicate=userRepository.findByEmail(user.getEmail());
         if(Objects.nonNull(emailDuplicate)){
-            return emailDuplicate;
+            throw new UserException("email already exist");// make email and username unique instead to fetching from database multiple times
         }
         if(Objects.isNull(user.getUsertype())){
             user.setUsertype(UserType.CUSTOMER);
@@ -53,7 +64,7 @@ public class UserServiceImplementation implements UserService {
         return user;
 
     }
-    public User login(User user) throws UserException {
+    public Token login(User user) throws UserException {
         if(Objects.isNull(user)){
             throw new UserException("credentials ");
         }
@@ -67,9 +78,12 @@ public class UserServiceImplementation implements UserService {
         if(Objects.isNull(loginUser)){
             throw new UserException("user not found");
         }
-        user.setToken(loginTokenService.createToken(user.getUsername()));
+        Token token=new Token();
+        token.setUserID(loginUser.getId());
+        token.setToken(jwtTokenService.createToken(loginUser.getUsername()));
+        Token savedToken=tokenRepository.save(token);
         if(passwordEncoder.matches(user.getPassword(), loginUser.getPassword())){
-            return user;
+            return savedToken;
         }else{
             throw new UserException("wrong password");
         }
@@ -87,5 +101,6 @@ public class UserServiceImplementation implements UserService {
         }
         return Boolean.TRUE;
     }
+
 
 }

@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RestaurnatRepository extends JpaRepository<Restaurant,Long> {
     Restaurant findRestaurantByid(Long id);
+    Restaurant findRestaurantByEmail(String email);
+
 }

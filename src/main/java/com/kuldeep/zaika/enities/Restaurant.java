@@ -1,5 +1,6 @@
 package com.kuldeep.zaika.enities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kuldeep.zaika.enums.RestaurantType;
 import com.kuldeep.zaika.enums.RunningStatus;
 import jakarta.persistence.*;
@@ -22,6 +23,12 @@ public class Restaurant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
     private Long id;
+    @Getter
+    @Setter
+    @NotNull
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
     @Getter
     @Setter
     @NotNull
@@ -54,6 +61,7 @@ public class Restaurant {
     private int rating;
     @Getter
     @Setter
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name="restaurant_cuisine",
     joinColumns = @JoinColumn(name="restaurant_id"),
