@@ -1,6 +1,7 @@
 package com.kuldeep.zaika.controllers;
 
 import com.kuldeep.zaika.enities.Restaurant;
+import com.kuldeep.zaika.enities.dto.RestaurantDto;
 import com.kuldeep.zaika.exceptions.AuthenticationException;
 import com.kuldeep.zaika.exceptions.RestaurantException;
 import com.kuldeep.zaika.services.RestaurantService;
@@ -35,10 +36,10 @@ public class RestaurantController {
         }
     }
     @GetMapping("/get")
-    ResponseEntity<Restaurant> getRestaurant(@RequestHeader("Authorization") String token,
+    ResponseEntity<RestaurantDto> getRestaurant(@RequestHeader("Authorization") String token,
                                              @RequestParam Long id){
         try {
-            Restaurant restaurant=restaurantService.getRestaurant(token,id);
+            RestaurantDto restaurant=restaurantService.getRestaurant(token,id);
             return new ResponseEntity<>(restaurant,HttpStatus.OK);
         }catch (AuthenticationException | RestaurantException e){
             log.error(e);
@@ -46,12 +47,13 @@ public class RestaurantController {
         }
     }
     @GetMapping("/getAll")
-    ResponseEntity<List<Restaurant>> getAllRestaurants(@RequestHeader("Authorization") String token,
-                                                       @RequestParam String username){
+    ResponseEntity<List<RestaurantDto>> getAllRestaurants(@RequestHeader("Authorization") String token,
+                                                          @RequestParam String username){
         try{
-            List<Restaurant> allRestaurants=restaurantService.getAllRestaurants(token,username);
+            List<RestaurantDto> allRestaurants=restaurantService.getAllRestaurants(token,username);
             return ResponseEntity.ok(allRestaurants);
-        } catch (AuthenticationException e) {
+
+        } catch (Exception e) {
             log.error(e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

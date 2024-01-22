@@ -2,6 +2,8 @@ package com.kuldeep.zaika.services.implementation;
 
 import com.kuldeep.zaika.enities.Restaurant;
 import com.kuldeep.zaika.enities.User;
+import com.kuldeep.zaika.enities.dto.RestaurantDto;
+import com.kuldeep.zaika.enities.dto.mapper.RestaurantDtoMapper;
 import com.kuldeep.zaika.enums.RestaurantType;
 import com.kuldeep.zaika.enums.UserType;
 import com.kuldeep.zaika.exceptions.AuthenticationException;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,15 +25,18 @@ public class RestaurantServiceImplementation implements RestaurantService {
     private final RestaurnatRepository restaurnatRepository;
     private final UserRepository userRepository;
     private final JwtTokenService jwtTokenService;
+    private final RestaurantDtoMapper restaurantDtoMapper;
 
 
     @Autowired
     public RestaurantServiceImplementation(RestaurnatRepository restaurnatRepository,
                                            UserRepository userRepository,
-                                           JwtTokenService jwtTokenService) {
+                                           JwtTokenService jwtTokenService,
+                                           RestaurantDtoMapper restaurantDtoMapper) {
         this.restaurnatRepository = restaurnatRepository;
         this.userRepository = userRepository;
         this.jwtTokenService = jwtTokenService;
+        this.restaurantDtoMapper=restaurantDtoMapper;
     }
 
     public Restaurant addRestaurant(Restaurant restaurant,String username,String token) throws RestaurantException, AuthenticationException {
@@ -61,16 +67,23 @@ public class RestaurantServiceImplementation implements RestaurantService {
         return savedRestaurant;
     }
 
-    public List<Restaurant> getAllRestaurants(String token,String username) throws AuthenticationException {
+    public List<RestaurantDto> getAllRestaurants(String token, String username) throws AuthenticationException, RestaurantException {
         token=jwtTokenService.convertTokenToString(token);
         if(Boolean.FALSE.equals(jwtTokenService.validateToken(token,username))){
             throw new AuthenticationException("Invalid Token");
         }
         List<Restaurant> allRestaurants=restaurnatRepository.findAll();
-        return allRestaurants;
+        if(Objects.isNull(allRestaurants)){
+            throw new RestaurantException("No Restaurant Found");
+        }
+        List<RestaurantDto> restaurantDtos=new ArrayList<>();
+        for(Restaurant restaurant:allRestaurants){
+            restaurantDtos.add(restaurantDtoMapper.toRestaurantDto(restaurant));
+        }
+        return restaurantDtos;
     }
 
-    public Restaurant getRestaurant(String token, Long id) throws AuthenticationException, RestaurantException {
+    public RestaurantDto getRestaurant(String token, Long id) throws AuthenticationException, RestaurantException {
         token=jwtTokenService.convertTokenToString(token);
         Restaurant restaurant=restaurnatRepository.findRestaurantByid(id);
         if(Objects.isNull(restaurant)){
@@ -79,7 +92,7 @@ public class RestaurantServiceImplementation implements RestaurantService {
         if(Boolean.FALSE.equals(jwtTokenService.validateToken(token, restaurant.getUser().getUsername()))){
             throw new AuthenticationException("Invalid Token");
         }
-        return restaurant;
+        return restaurantDtoMapper.toRestaurantDto(restaurant);
     }
 
 

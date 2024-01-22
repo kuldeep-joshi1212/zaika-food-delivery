@@ -2,11 +2,14 @@ package com.kuldeep.zaika.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.kuldeep.zaika.ZaikaConfigProperties;
 import com.kuldeep.zaika.exceptions.TokenException;
 import org.springframework.stereotype.Service;
 import com.auth0.jwt.algorithms.Algorithm;
+
+import java.util.Date;
 
 @Service
 public class JwtTokenServiceImplementation implements JwtTokenService {
@@ -31,15 +34,22 @@ public class JwtTokenServiceImplementation implements JwtTokenService {
         JWTVerifier verifier=JWT.require(algorithm)
                 .withIssuer(zaikaConfigProperties.issuer())
                 .build();
-
         DecodedJWT decodedJWT=verifier.verify(token);
         return  decodedJWT.getSubject();
     }
-    public Boolean validateToken(String token,String username){
-        if(getUsernameFromToken(token).equals(username)){
-            return true;
+    public Boolean validateToken(String token,String username)throws TokenException {
+        JWTVerifier verifier=JWT.require(algorithm)
+                .withIssuer(zaikaConfigProperties.issuer())
+                .build();
+        DecodedJWT decodedJWT=verifier.verify(token);
+        Date expiry=decodedJWT.getExpiresAt();
+        if(expiry.before(new Date())){
+            throw new TokenException("Token Expired");
         }
-        return false;
+        if(!getUsernameFromToken(token).equals(username)){
+            return false;
+        }
+        return true;
     }
 
     public String convertTokenToString(String token) {

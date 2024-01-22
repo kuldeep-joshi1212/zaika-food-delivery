@@ -3,6 +3,7 @@ package com.kuldeep.zaika.services.implementation;
 import com.kuldeep.zaika.ZaikaConfigProperties;
 import com.kuldeep.zaika.enities.Token;
 import com.kuldeep.zaika.enities.User;
+import com.kuldeep.zaika.enities.dto.UserLoginDto;
 import com.kuldeep.zaika.enums.UserType;
 import com.kuldeep.zaika.exceptions.UserException;
 import com.kuldeep.zaika.repositories.TokenRepository;
@@ -64,17 +65,17 @@ public class UserServiceImplementation implements UserService {
         return user;
 
     }
-    public Token login(User user) throws UserException {
-        if(Objects.isNull(user)){
+    public String login(UserLoginDto userLoginDto) throws UserException {
+        if(Objects.isNull(userLoginDto)){
             throw new UserException("credentials ");
         }
-        if(Boolean.FALSE.equals(StringUtils.hasText(user.getUsername()))){
+        if(Boolean.FALSE.equals(StringUtils.hasText(userLoginDto.getUsername()))){
             throw new UserException("username");
         }
-        if(Boolean.FALSE.equals(StringUtils.hasText(user.getPassword()))){
+        if(Boolean.FALSE.equals(StringUtils.hasText(userLoginDto.getPassword()))){
             throw new UserException("password");
         }
-        User loginUser=userRepository.findByUsername(user.getUsername());
+        User loginUser=userRepository.findByUsername(userLoginDto.getUsername());
         if(Objects.isNull(loginUser)){
             throw new UserException("user not found");
         }
@@ -82,8 +83,8 @@ public class UserServiceImplementation implements UserService {
         token.setUserID(loginUser.getId());
         token.setToken(jwtTokenService.createToken(loginUser.getUsername()));
         Token savedToken=tokenRepository.save(token);
-        if(passwordEncoder.matches(user.getPassword(), loginUser.getPassword())){
-            return savedToken;
+        if(passwordEncoder.matches(userLoginDto.getPassword(), loginUser.getPassword())){
+            return savedToken.getToken();
         }else{
             throw new UserException("wrong password");
         }

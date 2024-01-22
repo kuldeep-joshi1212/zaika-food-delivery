@@ -26,7 +26,7 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer ::disable)
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenService),AnonymousAuthenticationFilter.class)
                 .authorizeHttpRequests((requests)-> requests
-                        .requestMatchers(HttpMethod.POST ,"/user/signup","/user/login","/restaurant/getAll").permitAll()
+                        .requestMatchers(HttpMethod.POST ,"/user/signup","/user/login").permitAll()
                         .anyRequest().authenticated()
                 );
 

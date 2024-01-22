@@ -2,6 +2,7 @@ package com.kuldeep.zaika.controllers;
 
 import com.kuldeep.zaika.enities.Token;
 import com.kuldeep.zaika.enities.User;
+import com.kuldeep.zaika.enities.dto.UserLoginDto;
 import com.kuldeep.zaika.exceptions.UserException;
 import com.kuldeep.zaika.services.UserService;
 import lombok.extern.log4j.Log4j2;
@@ -37,9 +38,9 @@ public class UserController {
         }
     }
     @PostMapping("/login")
-    ResponseEntity<Token> login(@RequestBody User user){//will need to return jwt token here
+    ResponseEntity<String> login(@RequestBody UserLoginDto userLoginDto){//will need to return jwt token here
         try{
-            Token token=userService.login(user);
+            String token=userService.login(userLoginDto);
             if(Objects.nonNull(token)){
                 return ResponseEntity.ok(token);
             }

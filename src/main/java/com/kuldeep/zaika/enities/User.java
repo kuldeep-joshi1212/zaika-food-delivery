@@ -10,6 +10,7 @@ import java.util.List;
 
 @Entity
 @Table(name="users")
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
@@ -17,44 +18,43 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
     private Long id;
-    @Getter
-    @Setter
+
     @NotNull
     private String username;
-    @Getter
-    @Setter
+
     @NotNull
     private String firstname;
-    @Getter
-    @Setter
+
     @NotNull
     private String lastname;
-    @Getter
-    @Setter
+
     private UserType usertype;
-    @Getter
-    @Setter
+
     @NotNull
     private String email;
-    @Getter
-    @Setter
+
     @NotNull
     private String password;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
+
     @OneToMany(fetch = FetchType.LAZY,mappedBy ="user", cascade = CascadeType.ALL)
     private List<PaymentMethod> addresses;
+
     @OneToMany(fetch = FetchType.LAZY,mappedBy ="user", cascade = CascadeType.ALL)
     private List<Token> tokens;
+
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user",cascade = CascadeType.ALL)
     private List<Order> orders;
+
     @OneToOne
     @JoinColumn(name="cart_id")
     private Cart cart;
+
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "user",cascade = CascadeType.ALL)
     private List<Address> address;
-    @Getter
-    @Setter
+
     @OneToOne(mappedBy = "user")
     private Restaurant restaurant;
 }
