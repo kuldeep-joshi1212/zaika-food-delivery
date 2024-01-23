@@ -23,7 +23,10 @@ public class MenuServiceImplementation implements MenuService {
     private final RestaurnatRepository restaurnatRepository;
     private final MenuDtoMapper menuDtoMapper;
     @Autowired
-    public MenuServiceImplementation(JwtTokenService jwtTokenService, MenuRepository menuRepository, RestaurnatRepository restaurnatRepository, MenuDtoMapper menuDtoMapper) {
+    public MenuServiceImplementation(JwtTokenService jwtTokenService,
+                                     MenuRepository menuRepository,
+                                     RestaurnatRepository restaurnatRepository,
+                                     MenuDtoMapper menuDtoMapper) {
         this.jwtTokenService = jwtTokenService;
         this.menuRepository = menuRepository;
         this.restaurnatRepository = restaurnatRepository;
